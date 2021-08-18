@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:latest
+    container_name: gitlab
+    restart: always
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        # 配置ip
+        external_url "http://192.168.205.101"
+        # 配置ssh端口号
+        gitlab_rails['gitlab_shell_ssh_port'] = 2223
+    ports:
+      - "80:80"
+      - "8443:443"
+      - "2223:22"
+    volumes:
+      # 用于存储应用程序数据
+      - /gitlab/data:/var/opt/gitlab
+      # 用于存储日志
+      - /gitlab/logs:/var/log/gitlab
+      # 用于存储 GitLab 配置文件
+      - /gitlab/config:/etc/gitlab
+    networks:
+      - gitlab
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+    depends_on:
+      - gitlab
+    volumes:
+      - /gitlab/gitlab-runner:/etc/gitlab-runner
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /bin/docker:/bin/docker
+    networks:
+      - gitlab
+
+networks:
+  gitlab:
+    driver: bridge
