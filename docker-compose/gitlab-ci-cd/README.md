@@ -1,2 +1,1 @@
-# docker install gitlab-ce gitlab-runner
-
+# docker compose install gitlab-ce gitlab-runner
